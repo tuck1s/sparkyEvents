@@ -21,13 +21,21 @@ from __future__ import print_function
 from datetime import datetime,timedelta
 import configparser, time, json, sys, os, csv, requests
 
-T = 20                  # Global timeout value for API requests
+T = 60                  # Global timeout value for API requests
 
 def printHelp():
     progName = sys.argv[0]
     shortProgName = os.path.basename(progName)
     print('\nNAME')
     print('   ' + progName)
+    print('   Simple command-line tool to retrieve SparkPost message events into a .CSV file.\n')
+    print('SYNOPSIS')
+    print('  ./' + shortProgName + ' outfile.csv from_time to_time\n')
+    print('MANDATORY PARAMETERS')
+    print('    outfile.csv     output filename, must be writeable. Records included are specified in the .ini file.')
+    print('    from_time')
+    print('    to_time         Format YYYY-MM-DDTHH:MM')
+    print('')
 
 # Validate SparkPost message-events start_time format, which is just to 1 minute resolution without timezone offset.
 def isExpectedEventDateTimeFormat(timestamp):
@@ -80,10 +88,11 @@ baseUri = 'https://' + cfg.get('Host', 'api.sparkpost.com')
 
 events = cfg.get('Events', '')                  # If events are not specified, defaults to all
 
-attributes = cfg.get('Attributes', 'timestamp,type')     # if the fields are not specified, default to a basic few.  Strip newline and CR
-attributes = attributes.replace('\r', '').replace('\n', '')
-
+attributes = cfg.get('Attributes', 'timestamp,type')        # If the fields are not specified, default to a basic few
+attributes = attributes.replace('\r', '').replace('\n', '') # Strip newline and CR
 fList = attributes.split(',')
+
+timeZone = cfg.get('Timezone', 'UTC')         # If not specified, default to UTC
 
 if len(sys.argv) >= 4:
     outFname = sys.argv[1]
@@ -97,43 +106,38 @@ if len(sys.argv) >= 4:
             print('Error: unrecognised toTime:',toTime)
             exit(1)
 
-        firstPass = True;
+        fh = csv.DictWriter(outfile, fieldnames=fList, restval='', extrasaction='ignore')
+        fh.writeheader()
+        print('SparkPost events from ' + fromTime + ' to ' + toTime + ' ' + timeZone + ' to', outFname)
+        print('Events:     ', events if events else '<all>')
+        print('Attributes: ', fList)
         morePages = True;
         eventPage = 1
-        while morePages:
-            startT = time.time()                        # Measure time for each processing iteration
 
+        while morePages:
             p = {
                 'page': eventPage,
                 'per_page': 10000,
                 'from': fromTime,
                 'to': toTime,
-                'timezone': 'UTC'
+                'timezone': timeZone
             }
             if events:
                 p['events'] = events
-            res = getMessageEvents(uri = baseUri, apiKey=apiKey, params= p)
 
-            if not res:                                 # No result - unexpected error
+            startT = time.time()                        # Measure time for each processing iteration
+            res = getMessageEvents(uri=baseUri, apiKey=apiKey, params=p)
+            if not res:                                 # Unexpected error - quit
                 exit(1)
-
-            if firstPass:
-                fh = csv.DictWriter(outfile, fieldnames = fList, restval='')
-                fh.writeheader()
-                startT = time.time()
-                print('Collecting events from '+fromTime+' to '+toTime+' :',res['total_count'])
-                firstPass=False
-
-            # Write out results as CSV rows in the output file
             for i in res['results']:
-                if 'tdate' in i:
-                    pass #print(json.dumps(i))
-                fh.writerow(i)
-
+                fh.writerow(i)                          # Write out results as CSV rows in the output file
             endT = time.time()
-            print(outFname, 'page:',eventPage,':',len(res['results']), 'events written in', round(endT - startT, 3), 'seconds')
 
-            # Get the links.  If there is no 'next' link, we've reached the end.
+            if eventPage == 1:
+                print('Total events to fetch: ', res['total_count'])
+            print('Page {0:6d}: got {1:6d} events in {2:2.3f} seconds'.format(eventPage, len(res['results']), endT - startT) )
+
+            # Get the links from the response.  If there is a 'next' link, we continue processing
             morePages = False
             for l in res['links']:
                 if l['rel'] == 'next':
@@ -142,8 +146,7 @@ if len(sys.argv) >= 4:
                 elif l['rel'] == 'last' or l['rel'] == 'first' or l['rel'] == 'previous':
                     pass
                 else:
-                    print(json.dumps(l))
-
-        # Done all pages now
+                    print('Unexpected link in response: ', json.dumps(l))
+                    exit(1)
 else:
     printHelp()
