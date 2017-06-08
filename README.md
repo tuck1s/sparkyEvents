@@ -7,9 +7,12 @@ Set up a sparkpost.ini file as follows.
 ```
 [SparkPost]
 Authorization = <YOUR API KEY>
-Host = <your Enterprise host>'
-Events = bounce,delivery,spam_complaint,out_of_band,click,open
+Host = <your Enterprise host>
 
+# Choose which events you want in the output file.  Leave blank for all event types
+Events = bounce,delivery,spam_complaint,out_of_band,policy_rejection,click,open,generation_failure,generation_rejection,list_unsubscribe,link_unsubscribe
+
+# Choose which attributes you want in the output file
 Attributes = timestamp,type,
  bounce_class,campaign_id,customer_id,delv_method,device_token,dr_latency,error_code,event_id,
  fbtype,friendly_from,geo_ip,ip_address,ip_pool,mailfrom,message_id,msg_from,msg_size,num_retries,
@@ -27,9 +30,9 @@ Replace `<YOUR API KEY>` with your specific, private API key.
 
 `Host` is only needed for SparkPost Enterprise service usage; you can omit for [sparkpost.com](https://www.sparkpost.com/).
 
-`Events` is a list, as per [SparkPost Event types](https://developers.sparkpost.com/api/message-events.html#message-events-message-events-get); omit to select all.
+`Events` is a list, as per [SparkPost Event Types](https://developers.sparkpost.com/api/message-events.html#message-events-message-events-get); omit to select all.
 
-`Attributes` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can slit across lines 
+`Attributes` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can be split over lines 
 using indentation, as per [Python .ini file structure](https://docs.python.org/3/library/configparser.html#supported-ini-file-structure).
 
 ## Usage
@@ -72,7 +75,7 @@ Page      4: got  10000 events in 6.347 seconds
 ## See Also
 [SparkPost Developer Hub](https://developers.sparkpost.com/)
 
-[SparkPost Event types](https://developers.sparkpost.com/api/message-events.html#message-events-message-events-get)
+[SparkPost Event Types](https://developers.sparkpost.com/api/message-events.html#message-events-message-events-get)
 
 [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/)
 
