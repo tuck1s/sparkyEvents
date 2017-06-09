@@ -9,7 +9,7 @@ Set up a sparkpost.ini file as follows.
 Authorization = <YOUR API KEY>
 Host = <your Enterprise host>
 
-# Choose which events you want in the output file.  Leave blank for all event types
+# Choose which events you want in the output file.  Omit, or leave blank, for all event types
 Events = bounce,delivery,spam_complaint,out_of_band,policy_rejection,click,open,generation_failure,generation_rejection,list_unsubscribe,link_unsubscribe
 
 # Choose which attributes you want in the output file
@@ -50,10 +50,6 @@ MANDATORY PARAMETERS
     outfile.csv     output filename, must be writeable. Records included are specified in the .ini file.
     from_time
     to_time         Format YYYY-MM-DDTHH:MM
-
-Command-line parameters specify
-- action to take
-- list of Subaccounts and sending domains
 ```
 
 ## Example output
