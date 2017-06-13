@@ -88,9 +88,9 @@ baseUri = 'https://' + cfg.get('Host', 'api.sparkpost.com')
 
 events = cfg.get('Events', '')                  # If events are not specified, defaults to all
 
-attributes = cfg.get('Attributes', 'timestamp,type')        # If the fields are not specified, default to a basic few
-attributes = attributes.replace('\r', '').replace('\n', '') # Strip newline and CR
-fList = attributes.split(',')
+properties = cfg.get('Properties', 'timestamp,type')        # If the fields are not specified, default to a basic few
+properties = properties.replace('\r', '').replace('\n', '') # Strip newline and CR
+fList = properties.split(',')
 
 timeZone = cfg.get('Timezone', 'UTC')         # If not specified, default to UTC
 
@@ -110,7 +110,7 @@ if len(sys.argv) >= 4:
         fh.writeheader()
         print('SparkPost events from ' + fromTime + ' to ' + toTime + ' ' + timeZone + ' to', outFname)
         print('Events:     ', events if events else '<all>')
-        print('Attributes: ', fList)
+        print('Properties: ', fList)
         morePages = True;
         eventPage = 1
 

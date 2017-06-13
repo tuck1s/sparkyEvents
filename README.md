@@ -13,7 +13,7 @@ Host = <your Enterprise host>
 Events = bounce,delivery,spam_complaint,out_of_band,policy_rejection,click,open,generation_failure,generation_rejection,list_unsubscribe,link_unsubscribe
 
 # Choose which attributes you want in the output file
-Attributes = timestamp,type,
+Properties = timestamp,type,
  bounce_class,campaign_id,customer_id,delv_method,device_token,dr_latency,error_code,event_id,
  fbtype,friendly_from,geo_ip,ip_address,ip_pool,mailfrom,message_id,msg_from,msg_size,num_retries,
  queue_time,raw_rcpt_to,
@@ -32,7 +32,7 @@ Replace `<YOUR API KEY>` with your specific, private API key.
 
 `Events` is a list, as per [SparkPost Event Types](https://developers.sparkpost.com/api/message-events.html#message-events-message-events-get); omit to select all.
 
-`Attributes` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can be split over lines 
+`Properties` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can be split over lines 
 using indentation, as per [Python .ini file structure](https://docs.python.org/3/library/configparser.html#supported-ini-file-structure).
 
 ## Usage
@@ -58,7 +58,7 @@ MANDATORY PARAMETERS
 
 SparkPost events from 2017-06-04T00:00 to 2017-06-04T23:59 America/New_York to outfile.csv
 Events:      <all>
-Attributes:  ['timestamp', 'type', 'event_id', 'friendly_from', 'mailfrom', 'raw_rcpt_to', 'message_id', 'template_id', 'campaign_id', 'subaccount_id', 'subject', 'bounce_class', 'raw_reason', 'rcpt_meta', 'rcpt_tags']
+Properties:  ['timestamp', 'type', 'event_id', 'friendly_from', 'mailfrom', 'raw_rcpt_to', 'message_id', 'template_id', 'campaign_id', 'subaccount_id', 'subject', 'bounce_class', 'raw_reason', 'rcpt_meta', 'rcpt_tags']
 Total events to fetch:  18537125
 Page      1: got  10000 events in 5.958 seconds
 Page      2: got  10000 events in 5.682 seconds

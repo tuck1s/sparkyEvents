@@ -1,3 +1,4 @@
 *.json
 *.ini
 .idea
+*.csv
