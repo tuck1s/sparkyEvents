@@ -35,8 +35,8 @@ Replace `<YOUR API KEY>` with your specific, private API key.
 `Properties` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can be split over lines 
 using indentation, as per [Python .ini file structure](https://docs.python.org/3/library/configparser.html#supported-ini-file-structure).
 
-`Timezone` can be configured to suit your locale. It's used by SparkPost to interpret the from_time and to_time that you
-specify in the command-line parameters you specify.
+`Timezone` can be configured to suit your locale. It's used by SparkPost to interpret the event time range `from_time` 
+and `to_time` that you give in command-line parameters.
 ## Usage
 ```
 $ ./sparkyEvents.py 
@@ -54,6 +54,7 @@ MANDATORY PARAMETERS
     to_time         Format YYYY-MM-DDTHH:MM
 ```
 
+`from_time` and `to_time` are inclusive, so for example if you want a full day of events, use time T00:00 to T23:59.
 ## Example output
 ```
 ./sparkyEvents.py outfile.csv 2017-06-04T00:00 2017-06-04T23:59
