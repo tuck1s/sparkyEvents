@@ -46,14 +46,13 @@ def isExpectedEventDateTimeFormat(timestamp):
     except ValueError:
         return False
 
-def getMessageEvents(uri, apiKey, params):
+def getMessageEvents(url, apiKey, params):
     try:
-        path = uri + '/api/v1/message-events'
         h = {'Authorization': apiKey, 'Accept': 'application/json'}
 
         moreToDo = True
         while moreToDo:
-            response = requests.get(path, timeout=T, headers=h, params=params)
+            response = requests.get(url, timeout=T, headers=h, params=params)
 
             # Handle possible 'too many requests' error inside this module
             if response.status_code == 200:
@@ -113,20 +112,20 @@ if len(sys.argv) >= 4:
         print('Properties: ', fList)
         morePages = True;
         eventPage = 1
+        url = baseUri + '/api/v1/events/message'
+        p = {
+            'cursor': 'initial',
+            'per_page': 10000,
+            'from': fromTime,
+            'to': toTime,
+            'timezone': timeZone
+        }
+        if events:
+            p['events'] = events
 
         while morePages:
-            p = {
-                'page': eventPage,
-                'per_page': 10000,
-                'from': fromTime,
-                'to': toTime,
-                'timezone': timeZone
-            }
-            if events:
-                p['events'] = events
-
             startT = time.time()                        # Measure time for each processing iteration
-            res = getMessageEvents(uri=baseUri, apiKey=apiKey, params=p)
+            res = getMessageEvents(url=url, apiKey=apiKey, params=p)
             if not res:                                 # Unexpected error - quit
                 exit(1)
             for i in res['results']:
@@ -138,15 +137,11 @@ if len(sys.argv) >= 4:
             print('Page {0:6d}: got {1:6d} events in {2:2.3f} seconds'.format(eventPage, len(res['results']), endT - startT) )
 
             # Get the links from the response.  If there is a 'next' link, we continue processing
-            morePages = False
-            for l in res['links']:
-                if l['rel'] == 'next':
-                    eventPage+=1
-                    morePages=True
-                elif l['rel'] == 'last' or l['rel'] == 'first' or l['rel'] == 'previous':
-                    pass
-                else:
-                    print('Unexpected link in response: ', json.dumps(l))
-                    exit(1)
+            if 'links' in res and 'next' in res['links']:
+                eventPage+=1
+                url = baseUri + res['links']['next']
+                p = None                                 # All new params are in the returned "next" url
+            else:
+                morePages = False
 else:
     printHelp()
