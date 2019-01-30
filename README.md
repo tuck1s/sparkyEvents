@@ -1,8 +1,23 @@
 # sparkyEvents
 Simple command-line tool to retrieve SparkPost message events into a .CSV file.
 
+## Easy installation
+
+Firstly ensure you have `python3`, `pip` and `git`.
+
+Next, get the project. Install `pipenv`, and use this to install the project dependencies.
+```
+git clone https://github.com/tuck1s/sparkyEvents.git
+cd sparkyEvents
+pip install pipenv
+pipenv install
+pipenv shell
+```
+
+You can now type `./sparkyEvents.py` and see usage info.
+
 ## Pre-requisites
-Set up a sparkpost.ini file as follows.
+Set up the `sparkpost.ini` file as follows.
   
 ```
 [SparkPost]
