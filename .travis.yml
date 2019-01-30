@@ -17,7 +17,7 @@ before_script:
 
 script:
   # basic tests - command line tool installed and gives help/usage
-  - ./sparkyEvents
+  - ./sparkyEvents.py
 
 branches:
   only:
