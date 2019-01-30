@@ -1,0 +1,40 @@
+[SparkPost]
+# For SparkPost Enterprise, set a value here
+#Host = demo.api.e.sparkpost.com
+
+# Put your API key here
+Authorization = abcd
+
+#Leave the following undefined if you want ALL event types
+#Events = bounce,delivery,spam_complaint,out_of_band,policy_rejection,click,open,generation_failure,generation_rejection,list_unsubscribe,link_unsubscribe
+
+#List of event attributes to map into output file CSV fields.  These can be re-ordered or entries removed.
+#Can split entries across multiple lines in this file, thus:
+
+#Properties = timestamp,type,
+#  bounce_class,campaign_id,customer_id,delv_method,device_token,dr_latency,error_code,event_id,
+#  fbtype,friendly_from,geo_ip,ip_address,ip_pool,mailfrom,message_id,msg_from,msg_size,num_retries,
+#  queue_time,raw_rcpt_to,
+#  raw_reason,rcpt_meta,rcpt_subs,rcpt_tags,rcpt_to,rcpt_type,reason,
+#  remote_addr,report_by,report_to,routing_domain, sending_ip,
+#  sms_coding,sms_dst,sms_dst_npi,sms_dst_ton,sms_remoteids,sms_segments,sms_src,sms_src_npi,sms_src_ton,sms_text,
+#  stat_state,stat_type,subaccount_id,subject,
+#  target_link_name,target_link_url,template_id,template_version,transmission_id,user_agent,user_str
+
+#Properties for SparkPost Enterprise - full list - includes some additional values
+Properties = timestamp,type,binding,binding_group,
+  bounce_class,campaign_id,customer_id,delv_method,device_token,dr_latency,error_code,event_id,
+  fbtype,friendly_from,geo_ip,ip_address,ip_pool,mailfrom,message_id,msg_from,msg_size,num_retries,
+  pathway,pathway_group,
+  queue_time,raw_rcpt_to,
+  raw_reason,rcpt_meta,rcpt_subs,rcpt_tags,rcpt_to,rcpt_type,reason,recv_method,
+  remote_addr,report_by,report_to,routing_domain,sending_ip,
+  sms_coding,sms_dst,sms_dst_npi,sms_dst_ton,sms_remoteids,sms_segments,sms_src,sms_src_npi,sms_src_ton,sms_text,
+  stat_state,stat_type,subaccount_id,subject,
+  target_link_name,target_link_url,template_id,template_version,transmission_id,user_agent,user_str,
+  tdate
+
+
+# Timezone that from_time and to_time queries apply to
+#Timezone = America/New_York
+Timezone = Europe/London
