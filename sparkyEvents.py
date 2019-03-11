@@ -59,8 +59,8 @@ def getMessageEvents(url, apiKey, params):
                 return response.json()
             elif (response.status_code == 429 and response.json()['errors'][0]['message'] == 'Too many requests') or \
                  (response.status_code == 502 and response.json()['errors'][0]['message'] == 'Could not proceed (502 error)'):
-                    snooze = 120
-                    print('.. pausing', snooze, 'seconds for rate-limiting')
+                    snooze = 30
+                    print(response.json(),'.. pausing', snooze, 'seconds for rate-limiting')
                     time.sleep(snooze)
                     continue                # try again
             else:

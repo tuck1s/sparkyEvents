@@ -16,10 +16,11 @@ Next, get the project. Install `pipenv`, and use this to install the project dep
 ```
 git clone https://github.com/tuck1s/sparkyEvents.git
 cd sparkyEvents
-pip install pipenv
+pip install --user pipenv
 pipenv install
 pipenv shell
 ```
+_Note: In the above commands, you may need to run `pip3` instead of `pip`._
 
 You can now type `./sparkyEvents.py` and see usage info.
 
