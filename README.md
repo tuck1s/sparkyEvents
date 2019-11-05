@@ -76,7 +76,7 @@ using indentation, as per [Python .ini file structure](https://docs.python.org/3
 
 `Timezone` is no longer an .ini file option. Instead, specify timezone offset in your `from_time` and `to_time`.
 
-## Examples
+## Examples, timezone offsets
 
 `from_time` is *inclusive* and `to_time` is *exclusive* (see [API definition](https://developers.sparkpost.com/api/events/#events-get-search-for-message-events)), so the following example fetches exactly one hour's worth of events:
 
@@ -91,7 +91,9 @@ Total events to fetch:  82248
 :
 ```
 
-Timezone follows ISO8601 format, is of the form `Z` (meaning UTC) or `HH:MM`.  fetches the same data as the first example, but using India timezone (5½ hours ahead of UTC)
+Timezone offset is based on [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Dates) format. For UTC, you can specify `Z`, or select an offset in the format `HH:MM`.
+
+For example, to fetch the same data as above, but using India timezone (5½ hours ahead of UTC):
 
 `./sparkyEvents.py out3.csv 2019-11-05T13:30:00+05:30 2019-11-05T14:30:00+05:30`
 
@@ -103,11 +105,11 @@ Properties:  ['timestamp', 'subaccount_id', 'friendly_from', 'raw_rcpt_to', 'sub
 Total events to fetch:  82248
 ```
 
-Here is a search for the same data, but requesting in US Eastern time:
+Same data as above, but using US Eastern time (5 hours behind UTC):
 
 `./sparkyEvents.py out3.csv 2019-11-05T03:00:00-05:00 2019-11-05T04:00:00-05:00`
 
-If the from_time and to_time timezones differ, you'll see a warning but the search proceeds:
+If the `from_time` and `to_time` timezone offsets differ, you'll see a warning but the search will proceed:
 
 ` ./sparkyEvents.py out3.csv 2019-11-05T08:00:00Z 2019-11-05T14:30:00+05:30`
 
