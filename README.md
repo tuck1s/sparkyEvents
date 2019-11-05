@@ -12,7 +12,7 @@ Simple command-line tool to retrieve SparkPost message events into a .CSV file.
 
 Firstly ensure you have `python3`, `pip` and `git`.
 
-Next, get the project. Install `pipenv`, and use this to install the project dependencies.
+Next, get the project. Install `pipenv` (`--user` option recommended, [see this article](https://stackoverflow.com/questions/42988977/what-is-the-purpose-pip-install-user)) and use this to install the project dependencies.
 ```
 git clone https://github.com/tuck1s/sparkyEvents.git
 cd sparkyEvents
@@ -22,7 +22,25 @@ pipenv shell
 ```
 _Note: In the above commands, you may need to run `pip3` instead of `pip`._
 
-You can now type `./sparkyEvents.py` and see usage info.
+You can now type `./sparkyEvents.py -h` and see usage info:
+
+```
+ ./sparkyEvents.py -h
+usage: sparkyEvents.py [-h] outfile.csv from_time to_time
+
+Simple command-line tool to retrieve SparkPost message events into a .CSV
+file.
+
+positional arguments:
+  outfile.csv  output filename (CSV format), must be writeable.
+  from_time    Datetime in format of YYYY-MM-DDTHH:MM:ssZ, inclusive.
+  to_time      Datetime in format of YYYY-MM-DDTHH:MM:ssZ, exclusive.
+
+optional arguments:
+  -h, --help   show this help message and exit
+
+SparkPost API key, host, record event type(s) and properties are specified in sparkpost.ini.
+```
 
 ## Pre-requisites
 Set up the `sparkpost.ini` file as follows.
@@ -45,10 +63,8 @@ Properties = timestamp,type,
  sms_coding,sms_dst,sms_dst_npi,sms_dst_ton,sms_remoteids,sms_segments,sms_src,sms_src_npi,sms_src_ton,sms_text,
  stat_state,stat_type,subaccount_id,subject,
  target_link_name,target_link_url,template_id,template_version,transmission_id,user_agent,user_str
- 
-# Timezone that from_time and to_time queries apply to
-Timezone = America/New_York
 ```
+
 Replace `<YOUR API KEY>` with your specific, private API key. 
 
 `Host` is only needed for SparkPost Enterprise service usage; you can omit for [sparkpost.com](https://www.sparkpost.com/).
@@ -58,41 +74,50 @@ Replace `<YOUR API KEY>` with your specific, private API key.
 `Properties` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can be split over lines 
 using indentation, as per [Python .ini file structure](https://docs.python.org/3/library/configparser.html#supported-ini-file-structure).
 
-`Timezone` can be configured to suit your locale. It's used by SparkPost to interpret the event time range `from_time` 
-and `to_time` that you give in command-line parameters.
-## Usage
+`Timezone` is no longer an .ini file option. Instead, specify timezone offset in your from_time and to_time.
+
+
+Note `from_time` is *inclusive* and `to_time` is *exclusive*, so the following example fetches an exact one hours worth of events:
+
+## Examples
+
+`./sparkyEvents.py out3.csv 2019-11-05T08:00:00Z 2019-11-05T09:00:00Z`
 ```
-$ ./sparkyEvents.py 
-
-NAME
-   ./sparkyEvents.py
-   Simple command-line tool to retrieve SparkPost message events into a .CSV file.
-
-SYNOPSIS
-  ./sparkyEvents.py outfile.csv from_time to_time
-
-MANDATORY PARAMETERS
-    outfile.csv     output filename, must be writeable. Records included are specified in the .ini file.
-    from_time
-    to_time         Format YYYY-MM-DDTHH:MM
-```
-
-`from_time` and `to_time` are inclusive, so for example if you want a full day of events, use time T00:00 to T23:59.
-## Example output
-```
-./sparkyEvents.py outfile.csv 2017-06-04T00:00 2017-06-04T23:59
-
-SparkPost events from 2017-06-04T00:00 to 2017-06-04T23:59 America/New_York to outfile.csv
-Events:      <all>
-Properties:  ['timestamp', 'type', 'event_id', 'friendly_from', 'mailfrom', 'raw_rcpt_to', 'message_id', 'template_id', 'campaign_id', 'subaccount_id', 'subject', 'bounce_class', 'raw_reason', 'rcpt_meta', 'rcpt_tags']
-Total events to fetch:  18537125
-Page      1: got  10000 events in 5.958 seconds
-Page      2: got  10000 events in 5.682 seconds
-Page      3: got  10000 events in 5.438 seconds
-Page      4: got  10000 events in 6.347 seconds
+Time ranges to search are in timezone UTC
+SparkPost events from 2019-11-05 08:00:00+00:00 to 2019-11-05 09:00:00+00:00, writing to out3.csv
+Events:      injection,bounce,delivery,spam_complaint,out_of_band,policy_rejection,click,open,generation_failure,generation_rejection,list_unsubscribe,link_unsubscribe
+Properties:  ['timestamp', 'subaccount_id', 'friendly_from', 'raw_rcpt_to', 'subject']
+Total events to fetch:  82248
 :
 :
 ```
+
+Timezone follows ISO8601 format, is of the form `Z` (meaning UTC) or `HH:MM`.  fetches the same data as the first example, but using India timezone (5½ hours ahead of UTC)
+
+`./sparkyEvents.py out3.csv 2019-11-05T13:30:00+05:30 2019-11-05T14:30:00+05:30`
+
+```
+Time ranges to search are in timezone UTC+05:30
+SparkPost events from 2019-11-05 13:30:00+05:30 to 2019-11-05 14:30:00+05:30, writing to out3.csv
+Events:      injection,bounce,delivery,spam_complaint,out_of_band,policy_rejection,click,open,generation_failure,generation_rejection,list_unsubscribe,link_unsubscribe
+Properties:  ['timestamp', 'subaccount_id', 'friendly_from', 'raw_rcpt_to', 'subject']
+Total events to fetch:  82248
+```
+
+Here is a search for the same data, but requesting in US Eastern time:
+
+`./sparkyEvents.py out3.csv 2019-11-05T03:00:00-05:00 2019-11-05T04:00:00-05:00`
+
+If the from_time and to_time timezones differ, you'll see a warning but the search proceeds:
+
+` ./sparkyEvents.py out3.csv 2019-11-05T08:00:00Z 2019-11-05T14:30:00+05:30`
+
+```
+Warning: from_time and to_time are in different timezones UTC and UTC+05:30 - continuing
+```
+
+## Event results order
+
 
 ## See Also
 [SparkPost Developer Hub](https://developers.sparkpost.com/)

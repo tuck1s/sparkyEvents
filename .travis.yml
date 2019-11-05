@@ -1,13 +1,13 @@
 language: python
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7-dev"
+  - "3.7"
+  - "3.8"
 
 # command to install dependencies
 install:
-  - pip install pipenv
+  - pip install --user pipenv
   - pipenv install
 
 before_script:
@@ -16,7 +16,7 @@ before_script:
 
 script:
   # basic tests - command line tool installed and gives help/usage
-  - ./sparkyEvents.py
+  - ./sparkyEvents.py -h
 
 branches:
   only:

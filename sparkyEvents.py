@@ -28,7 +28,7 @@ def getMessageEvents(url, apiKey, params):
     :return:
     """
     try:
-        T = 60  # Reasonable imeout value for API requests
+        T = 60  # Reasonable timeout value for API requests
         h = {'Authorization': apiKey, 'Accept': 'application/json'}
 
         moreToDo = True
@@ -86,6 +86,10 @@ parser.add_argument('from_time', type=iso8601_tzoffset,
 parser.add_argument('to_time', type=iso8601_tzoffset,
                     help='Datetime in format of YYYY-MM-DDTHH:MM:ssZ, exclusive.')
 args = parser.parse_args()
+if args.from_time.tzinfo != args.to_time.tzinfo:
+    print('Warning: from_time and to_time are in different timezones {} and {} - continuing'.format(args.from_time.tzinfo, args.to_time.tzinfo))
+else:
+    print('Time ranges to search are in timezone {}'.format(args.from_time.tzinfo))
 fh = csv.DictWriter(args.outfile, fieldnames=fList, restval='', extrasaction='ignore')
 fh.writeheader()
 print('SparkPost events from {} to {}, writing to {}'.format(args.from_time, args.to_time, args.outfile.name))
