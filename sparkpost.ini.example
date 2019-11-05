@@ -34,7 +34,4 @@ Properties = timestamp,type,binding,binding_group,
   target_link_name,target_link_url,template_id,template_version,transmission_id,user_agent,user_str,
   tdate
 
-
-# Timezone that from_time and to_time queries apply to
-#Timezone = America/New_York
-Timezone = Europe/London
+# Timezone is no longer specified in .INI file - it's in the from_time/to_time command-line parameters themselves.

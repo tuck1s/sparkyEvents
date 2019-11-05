@@ -2,3 +2,5 @@
 *.ini
 .idea
 *.csv
+Pipfile.lock
+.DS_Store

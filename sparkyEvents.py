@@ -1,53 +1,34 @@
 #!/usr/bin/env python3
-#
-#Copyright  2017 SparkPost
-#
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
-#
-# Author: Steve Tuck (June 2017)
-#
-
 from __future__ import print_function
-from datetime import datetime,timedelta
-import configparser, time, json, sys, os, csv, requests
+from datetime import datetime
+import configparser, argparse, time, sys, os, csv, requests
 
-T = 60                  # Global timeout value for API requests
+def iso8601_tzoffset(timestamp):
+    """
+    Validate SparkPost Events (https://developers.sparkpost.com/api/events/) time string, which now includes Seconds and (optional) timezone offset.
 
-def printHelp():
-    progName = sys.argv[0]
-    shortProgName = os.path.basename(progName)
-    print('\nNAME')
-    print('   ' + progName)
-    print('   Simple command-line tool to retrieve SparkPost message events into a .CSV file.\n')
-    print('SYNOPSIS')
-    print('  ./' + shortProgName + ' outfile.csv from_time to_time\n')
-    print('MANDATORY PARAMETERS')
-    print('    outfile.csv     output filename, must be writeable. Records included are specified in the .ini file.')
-    print('    from_time')
-    print('    to_time         Format YYYY-MM-DDTHH:MM')
-    print('')
-
-# Validate SparkPost message-events start_time format, which is just to 1 minute resolution without timezone offset.
-def isExpectedEventDateTimeFormat(timestamp):
-    format_string = '%Y-%m-%dT%H:%M'
+    :param timestamp: str
+    :return: datetime
+    """
+    format_string = '%Y-%m-%dT%H:%M:%S%z'
     try:
-        datetime.strptime(timestamp, format_string)
-        return True
-    except ValueError:
-        return False
+        d= datetime.strptime(timestamp, format_string)
+    except ValueError as e:
+        raise argparse.ArgumentTypeError(e)
+    return d
+
 
 def getMessageEvents(url, apiKey, params):
+    """
+    Get SparkPost message events with specified endpoint URL, API Key, and search params.
+
+    :param url: str
+    :param apiKey: str
+    :param params:
+    :return:
+    """
     try:
+        T = 60  # Reasonable imeout value for API requests
         h = {'Authorization': apiKey, 'Accept': 'application/json'}
 
         moreToDo = True
@@ -59,17 +40,18 @@ def getMessageEvents(url, apiKey, params):
                 return response.json()
             elif (response.status_code == 429 and response.json()['errors'][0]['message'] == 'Too many requests') or \
                  (response.status_code == 502 and response.json()['errors'][0]['message'] == 'Could not proceed (502 error)'):
-                    snooze = 30
-                    print(response.json(),'.. pausing', snooze, 'seconds for rate-limiting')
-                    time.sleep(snooze)
-                    continue                # try again
+                snooze = 30
+                print(response.json(), '.. pausing', snooze, 'seconds for rate-limiting')
+                time.sleep(snooze)
+                continue                # try again
             else:
                 print('Error:', response.status_code, ':', response.text)
                 return None
 
     except ConnectionError as err:
-        print('error code', err.status_code)
+        print('error code', err)
         exit(1)
+
 
 # -----------------------------------------------------------------------------------------
 # Main code
@@ -85,63 +67,62 @@ if not apiKey:
     exit(1)
 baseUri = 'https://' + cfg.get('Host', 'api.sparkpost.com')
 
-events = cfg.get('Events', '')                  # If events are not specified, defaults to all
+# If events are not specified, defaults to all
+events = cfg.get('Events', '')
 
-properties = cfg.get('Properties', 'timestamp,type')        # If the fields are not specified, default to a basic few
-properties = properties.replace('\r', '').replace('\n', '') # Strip newline and CR
+# If the fields are not specified, default to a basic few
+properties = cfg.get('Properties', 'timestamp,type')
+properties = properties.replace('\r', '').replace('\n', '')  # Strip newline and CR
 fList = properties.split(',')
 
-timeZone = cfg.get('Timezone', 'UTC')         # If not specified, default to UTC
+# If not specified, default to UTC
+parser = argparse.ArgumentParser(
+    description='Simple command-line tool to retrieve SparkPost message events into a .CSV file.',
+    epilog='SparkPost API key, host, record event type(s) and properties are specified in {}.'.format(configFile))
+parser.add_argument('outfile', metavar='outfile.csv', type=argparse.FileType('w'),
+                    help='output filename (CSV format), must be writeable.')
+parser.add_argument('from_time', type=iso8601_tzoffset,
+                    help='Datetime in format of YYYY-MM-DDTHH:MM:ssZ, inclusive.')
+parser.add_argument('to_time', type=iso8601_tzoffset,
+                    help='Datetime in format of YYYY-MM-DDTHH:MM:ssZ, exclusive.')
+args = parser.parse_args()
+fh = csv.DictWriter(args.outfile, fieldnames=fList, restval='', extrasaction='ignore')
+fh.writeheader()
+print('SparkPost events from {} to {}, writing to {}'.format(args.from_time, args.to_time, args.outfile.name))
+print('Events:     ', events if events else '<all>')
+print('Properties: ', fList)
+morePages = True
+eventPage = 1
+url = baseUri + '/api/v1/events/message'
+p = {
+    'cursor': 'initial',
+    'per_page': 10000,
+    'from': args.from_time,
+    'to': args.to_time,
+}
+if events:
+    p['events'] = events
 
-if len(sys.argv) >= 4:
-    outFname = sys.argv[1]
-    with open(outFname, 'w', newline='') as outfile:
-        fromTime = sys.argv[2];
-        if not(isExpectedEventDateTimeFormat(fromTime)):
-            print('Error: unrecognised fromTime:',fromTime)
-            exit(1)
-        toTime = sys.argv[3];
-        if not(isExpectedEventDateTimeFormat(toTime)):
-            print('Error: unrecognised toTime:',toTime)
-            exit(1)
+while morePages:
+    # Measure time for each processing iteration
+    startT = time.time()
+    res = getMessageEvents(url=url, apiKey=apiKey, params=p)
+    if not res:                                 # Unexpected error - quit
+        exit(1)
+    for i in res['results']:
+        # Write out results as CSV rows in the output file
+        fh.writerow(i)
+    endT = time.time()
 
-        fh = csv.DictWriter(outfile, fieldnames=fList, restval='', extrasaction='ignore')
-        fh.writeheader()
-        print('SparkPost events from ' + fromTime + ' to ' + toTime + ' ' + timeZone + ' to', outFname)
-        print('Events:     ', events if events else '<all>')
-        print('Properties: ', fList)
-        morePages = True;
-        eventPage = 1
-        url = baseUri + '/api/v1/events/message'
-        p = {
-            'cursor': 'initial',
-            'per_page': 10000,
-            'from': fromTime,
-            'to': toTime,
-            'timezone': timeZone
-        }
-        if events:
-            p['events'] = events
+    if eventPage == 1:
+        print('Total events to fetch: ', res['total_count'])
+    print('Page {0:6d}: got {1:6d} events in {2:2.3f} seconds'.format(
+        eventPage, len(res['results']), endT - startT))
 
-        while morePages:
-            startT = time.time()                        # Measure time for each processing iteration
-            res = getMessageEvents(url=url, apiKey=apiKey, params=p)
-            if not res:                                 # Unexpected error - quit
-                exit(1)
-            for i in res['results']:
-                fh.writerow(i)                          # Write out results as CSV rows in the output file
-            endT = time.time()
-
-            if eventPage == 1:
-                print('Total events to fetch: ', res['total_count'])
-            print('Page {0:6d}: got {1:6d} events in {2:2.3f} seconds'.format(eventPage, len(res['results']), endT - startT) )
-
-            # Get the links from the response.  If there is a 'next' link, we continue processing
-            if 'links' in res and 'next' in res['links']:
-                eventPage+=1
-                url = baseUri + res['links']['next']
-                p = None                                 # All new params are in the returned "next" url
-            else:
-                morePages = False
-else:
-    printHelp()
+    # Get the links from the response.  If there is a 'next' link, we continue processing
+    if 'links' in res and 'next' in res['links']:
+        eventPage += 1
+        url = baseUri + res['links']['next']
+        p = None                                 # All new params are in the returned "next" url
+    else:
+        morePages = False
