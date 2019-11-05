@@ -74,12 +74,11 @@ Replace `<YOUR API KEY>` with your specific, private API key.
 `Properties` can be any of the [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/). Definition can be split over lines 
 using indentation, as per [Python .ini file structure](https://docs.python.org/3/library/configparser.html#supported-ini-file-structure).
 
-`Timezone` is no longer an .ini file option. Instead, specify timezone offset in your from_time and to_time.
-
-
-Note `from_time` is *inclusive* and `to_time` is *exclusive*, so the following example fetches an exact one hours worth of events:
+`Timezone` is no longer an .ini file option. Instead, specify timezone offset in your `from_time` and `to_time`.
 
 ## Examples
+
+`from_time` is *inclusive* and `to_time` is *exclusive* (see [API definition](https://developers.sparkpost.com/api/events/#events-get-search-for-message-events)), so the following example fetches exactly one hour's worth of events:
 
 `./sparkyEvents.py out3.csv 2019-11-05T08:00:00Z 2019-11-05T09:00:00Z`
 ```
@@ -116,15 +115,10 @@ If the from_time and to_time timezones differ, you'll see a warning but the sear
 Warning: from_time and to_time are in different timezones UTC and UTC+05:30 - continuing
 ```
 
-## Event results order
-
-
 ## See Also
 [SparkPost Developer Hub](https://developers.sparkpost.com/)
 
-[SparkPost Event Types](https://developers.sparkpost.com/api/message-events.html#message-events-message-events-get)
+[SparkPost Event Types](https://developers.sparkpost.com/api/events/#header-event-types)
 
 [SparkPost Event Properties](https://www.sparkpost.com/docs/tech-resources/webhook-event-reference/)
-
-[Getting Started on SparkPost Enterprise](https://support.sparkpost.com/customer/portal/articles/2162798-getting-started-on-sparkpost-enterprise)
 
