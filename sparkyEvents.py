@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 from __future__ import print_function
 from datetime import datetime
-import configparser, argparse, time, sys, os, csv, requests
+import configparser
+import argparse
+import time
+import sys
+import os
+import csv
+import requests
+
 
 def iso8601_tzoffset(timestamp):
     """
@@ -12,7 +19,7 @@ def iso8601_tzoffset(timestamp):
     """
     format_string = '%Y-%m-%dT%H:%M:%S%z'
     try:
-        d= datetime.strptime(timestamp, format_string)
+        d = datetime.strptime(timestamp, format_string)
     except ValueError as e:
         raise argparse.ArgumentTypeError(e)
     return d
@@ -24,8 +31,8 @@ def getMessageEvents(url, apiKey, params):
 
     :param url: str
     :param apiKey: str
-    :param params:
-    :return:
+    :param params: dict
+    :return: dict
     """
     try:
         T = 60  # Reasonable timeout value for API requests
@@ -41,7 +48,8 @@ def getMessageEvents(url, apiKey, params):
             elif (response.status_code == 429 and response.json()['errors'][0]['message'] == 'Too many requests') or \
                  (response.status_code == 502 and response.json()['errors'][0]['message'] == 'Could not proceed (502 error)'):
                 snooze = 30
-                print(response.json(), '.. pausing', snooze, 'seconds for rate-limiting')
+                print(response.json(),
+                      '.. pausing {} seconds for rate-limiting'.format(snooze))
                 time.sleep(snooze)
                 continue                # try again
             else:
@@ -72,10 +80,11 @@ events = cfg.get('Events', '')
 
 # If the fields are not specified, default to a basic few
 properties = cfg.get('Properties', 'timestamp,type')
-properties = properties.replace('\r', '').replace('\n', '')  # Strip newline and CR
+properties = properties.replace('\r', '').replace(
+    '\n', '')  # Strip newline and CR
 fList = properties.split(',')
 
-# If not specified, default to UTC
+# Read and validate command-line arguments
 parser = argparse.ArgumentParser(
     description='Simple command-line tool to retrieve SparkPost message events into a .CSV file.',
     epilog='SparkPost API key, host, record event type(s) and properties are specified in {}.'.format(configFile))
@@ -87,12 +96,17 @@ parser.add_argument('to_time', type=iso8601_tzoffset,
                     help='Datetime in format of YYYY-MM-DDTHH:MM:ssZ, exclusive.')
 args = parser.parse_args()
 if args.from_time.tzinfo != args.to_time.tzinfo:
-    print('Warning: from_time and to_time are in different timezones {} and {} - continuing'.format(args.from_time.tzinfo, args.to_time.tzinfo))
+    print('Warning: from_time and to_time are in different timezones {} and {} - continuing'.format(
+        args.from_time.tzinfo, args.to_time.tzinfo))
 else:
     print('Time ranges to search are in timezone {}'.format(args.from_time.tzinfo))
-fh = csv.DictWriter(args.outfile, fieldnames=fList, restval='', extrasaction='ignore')
+
+# Write CSV file header, fetch events
+fh = csv.DictWriter(args.outfile, fieldnames=fList,
+                    restval='', extrasaction='ignore')
 fh.writeheader()
-print('SparkPost events from {} to {}, writing to {}'.format(args.from_time, args.to_time, args.outfile.name))
+print('SparkPost events from {} to {}, writing to {}'.format(
+    args.from_time, args.to_time, args.outfile.name))
 print('Events:     ', events if events else '<all>')
 print('Properties: ', fList)
 morePages = True
@@ -123,7 +137,7 @@ while morePages:
     print('Page {0:6d}: got {1:6d} events in {2:2.3f} seconds'.format(
         eventPage, len(res['results']), endT - startT))
 
-    # Get the links from the response.  If there is a 'next' link, we continue processing
+    # Get the links from the response.  If there is a 'next' link, continue processing
     if 'links' in res and 'next' in res['links']:
         eventPage += 1
         url = baseUri + res['links']['next']

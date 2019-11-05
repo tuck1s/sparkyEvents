@@ -7,3 +7,4 @@ name = "pypi"
 requests = "*"
 
 [dev-packages]
+"autopep8" = "*"
