@@ -91,7 +91,7 @@ Total events to fetch:  82248
 :
 ```
 
-Timezone offset is based on [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Dates) format. For UTC, you can specify `Z`, or select an offset in the format `HH:MM`.
+Timezone offset is based on [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Dates) format. For UTC, you can specify `Z`, or select an offset in the format `+` `-` `HH:MM` or `HHMM`.
 
 For example, to fetch the same data as above, but using India timezone (5½ hours ahead of UTC):
 

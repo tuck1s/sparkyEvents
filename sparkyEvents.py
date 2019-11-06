@@ -8,11 +8,13 @@ import sys
 import os
 import csv
 import requests
+import re
 
 
 def iso8601_tzoffset(timestamp):
     """
     Validate SparkPost Events (https://developers.sparkpost.com/api/events/) time string, which now includes Seconds and (optional) timezone offset.
+    Beautiful idea made ugly by strptime() timzone offset syntax being much stricter than SparkPost.
 
     :param timestamp: str
     :return: datetime
@@ -21,7 +23,25 @@ def iso8601_tzoffset(timestamp):
     try:
         d = datetime.strptime(timestamp, format_string)
     except ValueError as e:
-        raise argparse.ArgumentTypeError(e)
+        # SparkPost accepts Z, but strptime doesn't on all platforms, so fix it up here
+        if timestamp.endswith('Z'):
+            timestamp = timestamp.rstrip('Z') + '0000'
+        else:
+            try:
+                d = datetime.strptime(timestamp, format_string)
+                return d
+            except:
+                # SparkPost accepts timezone HH:MM with separator, but strptime requires HHMM, fix it up here
+                sep = max(timestamp.rfind('+'), timestamp.rfind('-'))
+                if sep < 0:
+                    raise argparse.ArgumentTypeError(e)
+                tz = timestamp[sep:]
+                timestamp = timestamp[:sep] + tz[0:1] + tz[2:]
+                try:
+                    d = datetime.strptime(timestamp, format_string)
+                    return d
+                except:
+                    raise argparse.ArgumentTypeError(e)
     return d
 
 
@@ -99,7 +119,8 @@ if args.from_time.tzinfo != args.to_time.tzinfo:
     print('Warning: from_time and to_time are in different timezones {} and {} - continuing'.format(
         args.from_time.tzinfo, args.to_time.tzinfo))
 else:
-    print('Time ranges to search are in timezone {}'.format(args.from_time.tzinfo))
+    print('Time ranges to search are in timezone {}'.format(
+        args.from_time.tzinfo))
 
 # Write CSV file header, fetch events
 fh = csv.DictWriter(args.outfile, fieldnames=fList,
