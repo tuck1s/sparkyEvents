@@ -26,23 +26,22 @@ def iso8601_tzoffset(timestamp):
     except ValueError as e:
         # SparkPost accepts Z, but strptime doesn't on all platforms, so fix it up here
         if timestamp.endswith('Z'):
-            timestamp = timestamp.rstrip('Z') + '0000'
+            timestamp = timestamp.rstrip('Z') + '+0000'
         else:
-            try:
-                d = datetime.strptime(timestamp, format_string)
-                return d
-            except:
-                # SparkPost accepts timezone HH:MM with separator, but strptime requires HHMM, fix it up here
-                sep = max(timestamp.rfind('+'), timestamp.rfind('-'))
-                if sep < 0:
-                    raise argparse.ArgumentTypeError(e)
+            # SparkPost accepts timezone HH:MM with separator, but strptime requires HHMM, fix it up here
+            sep = max(timestamp.rfind('+'), timestamp.rfind('-'))
+            if sep < 0:
+                raise argparse.ArgumentTypeError(e)
+            else:
                 tz = timestamp[sep:]
-                timestamp = timestamp[:sep] + tz[0:1] + tz[2:]
-                try:
-                    d = datetime.strptime(timestamp, format_string)
-                    return d
-                except:
-                    raise argparse.ArgumentTypeError(e)
+                dmyhms = timestamp[:sep]
+                tz = tz.replace(':', '')
+                timestamp = dmyhms + tz
+        try:
+            d = datetime.strptime(timestamp, format_string)
+            return d
+        except:
+            raise argparse.ArgumentTypeError(e)
 
 
 def getMessageEvents(url, apiKey, params):
