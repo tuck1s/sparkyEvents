@@ -22,6 +22,7 @@ def iso8601_tzoffset(timestamp):
     format_string = '%Y-%m-%dT%H:%M:%S%z'
     try:
         d = datetime.strptime(timestamp, format_string)
+        return d
     except ValueError as e:
         # SparkPost accepts Z, but strptime doesn't on all platforms, so fix it up here
         if timestamp.endswith('Z'):
@@ -42,7 +43,6 @@ def iso8601_tzoffset(timestamp):
                     return d
                 except:
                     raise argparse.ArgumentTypeError(e)
-    return d
 
 
 def getMessageEvents(url, apiKey, params):
