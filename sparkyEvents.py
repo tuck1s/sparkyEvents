@@ -24,19 +24,19 @@ def iso8601_tzoffset(timestamp):
         d = datetime.strptime(timestamp, format_string)
         return d
     except ValueError as e:
-        # SparkPost accepts Z, but strptime doesn't on all platforms, so fix it up here
+        # We want to accept "Z", but strptime < Python 3.7 doesn't, fix it up here
         if timestamp.endswith('Z'):
             timestamp = timestamp.rstrip('Z') + '+0000'
         else:
-            # SparkPost accepts timezone HH:MM with separator, but strptime requires HHMM, fix it up here
+            # We want to accept HH:MM with colon, but strptime < Python 3.7 doesn't, fix it up here
             sep = max(timestamp.rfind('+'), timestamp.rfind('-'))
             if sep < 0:
                 raise argparse.ArgumentTypeError(e)
             else:
                 tz = timestamp[sep:]
-                dmyhms = timestamp[:sep]
+                ymdhms = timestamp[:sep]
                 tz = tz.replace(':', '')
-                timestamp = dmyhms + tz
+                timestamp = ymdhms + tz
         try:
             d = datetime.strptime(timestamp, format_string)
             return d
