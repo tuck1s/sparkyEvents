@@ -3,7 +3,7 @@
 [Sign up](https://app.sparkpost.com/join?plan=free-0817?src=Social%20Media&sfdcid=70160000000pqBb&pc=GitHubSignUp&utm_source=github&utm_medium=social-media&utm_campaign=github&utm_content=sign-up) for a SparkPost account and visit our [Developer Hub](https://developers.sparkpost.com) for even more content.
 
 # sparkyEvents (new)
-[![Build Status](https://travis-ci.org/tuck1s/sparkyEvents.svg?branch=master)](https://travis-ci.org/tuck1s/sparkyEvents)
+[![Build Status](https://travis-ci.com/tuck1s/sparkyEvents.svg?branch=master)](https://travis-ci.com/tuck1s/sparkyEvents)
 
 Simple command-line tool to retrieve SparkPost message events into a .CSV file.
 
