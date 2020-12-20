@@ -58,7 +58,7 @@ Total events to fetch:  824
 Page      1: got    824 events in 1.290 seconds
 ```
 
-The progress messages are printed to `stderr` so you can pipe the actual utput somewhere, e.g. to [csvkit](https://csvkit.readthedocs.io/) tools.
+The progress messages are printed to `stderr` so you can pipe the actual output somewhere, e.g. to [csvkit](https://csvkit.readthedocs.io/) tools.
 
 ## Parameters that support keyword searching
 
