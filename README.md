@@ -46,7 +46,7 @@ The syntax for specifying time ranges has changed, and takes times in UTC only, 
 The following example fetches events for the December 2020 Gmail outage.
 
 ```
-./sparkyEvents.py -o out6.csv --from 2020-12-14T22:00:00Z --to 2020-12-16T00:00:00Z --events bounce --bounce_classes 10 --reasons gsmtp
+./sparkyEvents.py -o out6.csv --from 2020-12-14T22:00:00Z --to 2020-12-16T00:00:00Z --events bounce,out_of_band --bounce_classes 10 --reasons gsmtp
 Writing to out6.csv
 from                     2020-12-14T22:00:00Z
 to                       2020-12-16T00:00:00Z
