@@ -106,6 +106,8 @@ in1.add_argument('--ip_pools', type=kwdStr, help='Comma delimited list of IP poo
 in1.add_argument('--subaccounts', type=str, help='Comma delimited list of subaccount IDs to search')
 in1.add_argument('--messages', type=str, help='Comma delimited list of message IDs to search')
 in1.add_argument('--transmissions', type=str, help='Comma delimited list of transmission IDs to search')
+in1.add_argument('--mailbox_providers', type=kwdStr, help='Comma delimited list of mailbox providers to search. Supports keyword searching.')
+in1.add_argument('--mailbox_provider_regions', type=kwdStr, help='Comma delimited list of mailbox provider regions to search. Supports keyword searching.')
 in1.add_argument('--ab_tests', type=kwdStr, help='Comma delimited list of A/B test IDs to search. Supports keyword searching')
 in1.add_argument('--ab_test_versions', type=str, help='Comma delimited list of version numbers of A/B tests to search. If provided, ab_tests parameter becomes required')
 in2 = parser.add_argument_group('Special options')

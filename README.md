@@ -7,10 +7,14 @@
 
 Command-line tool to retrieve SparkPost message events in `.CSV` format.
 
-> Dec 2020: Command-line options have changed!
-> - Now supports all API event search parameters
-> - Output to file or stdout
-> - Show possible event types / properties from your SparkPost account
+## Recent changes
+
+|Version|Date|Description
+|--|--|--|
+0.2.1|Mar 2021|Add `mailbox_provider` and `mailbox_provider_region`
+0.2.0|Dec 2020|Command-line options changed. Now supports all API event search parameters. Output to file or stdout. Show possible event types / properties from your SparkPost account
+0.1.0|Nov 2019|New Events Search API
+
 
 ## Easy installation
 
@@ -74,7 +78,7 @@ The following special options do not actually fetch events; they show what's ava
 ./sparkyEvents.py --show_properties
 ```
 ```
-ab_test_id,ab_test_version,amp_enabled,bounce_class,campaign_id,click_tracking,customer_id,delv_method,device_token,display_name,dr_latency,error_code,event_description,event_id,fbtype,friendly_from,geo_ip,initial_pixel,injection_time,ip_address,ip_pool,mailfrom,message_id,msg_from,msg_size,num_retries,open_tracking,outbound_tls,queue_time,raw_rcpt_to,raw_reason,rcpt_hash,rcpt_meta,rcpt_subs,rcpt_tags,rcpt_to,rcpt_type,reason,recipient_domain,recv_method,remote_addr,report_by,report_to,routing_domain,scheduled_time,sending_domain,sending_ip,sms_coding,sms_dst,sms_dst_npi,sms_dst_ton,sms_remoteids,sms_segments,sms_src,sms_src_npi,sms_src_ton,sms_text,stat_state,stat_type,subaccount_id,subject,target_link_name,target_link_url,template_id,template_version,timestamp,transactional,transmission_id,type,user_agent
+ab_test_id,ab_test_version,amp_enabled,bounce_class,campaign_id,click_tracking,customer_id,delv_method,device_token,display_name,dr_latency,error_code,event_description,event_id,fbtype,friendly_from,geo_ip,initial_pixel,injection_time,ip_address,ip_pool,mailbox_provider,mailbox_provider_region,mailfrom,message_id,msg_from,msg_size,num_retries,open_tracking,outbound_tls,queue_time,raw_rcpt_to,raw_reason,rcpt_hash,rcpt_meta,rcpt_subs,rcpt_tags,rcpt_to,rcpt_type,reason,recipient_domain,recv_method,remote_addr,report_by,report_to,routing_domain,scheduled_time,sending_domain,sending_ip,sms_coding,sms_dst,sms_dst_npi,sms_dst_ton,sms_remoteids,sms_segments,sms_src,sms_src_npi,sms_src_ton,sms_text,stat_state,stat_type,subaccount_id,subject,target_link_name,target_link_url,template_id,template_version,timestamp,transactional,transmission_id,type,user_agent
 ```
 
 ```
