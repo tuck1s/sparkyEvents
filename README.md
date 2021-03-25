@@ -11,7 +11,7 @@ Command-line tool to retrieve SparkPost message events in `.CSV` format.
 
 |Version|Date|Description
 |--|--|--|
-0.2.1|Mar 2021|Add `mailbox_provider` and `mailbox_provider_region`
+0.2.1|Mar 2021|Add `mailbox_providers` and `mailbox_provider_regions`
 0.2.0|Dec 2020|Command-line options changed. Now supports all API event search parameters. Output to file or stdout. Show possible event types / properties from your SparkPost account
 0.1.0|Nov 2019|New Events Search API
 
