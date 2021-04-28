@@ -20,11 +20,13 @@ Command-line tool to retrieve SparkPost message events in `.CSV` format.
 
 Firstly ensure you have `python3`, `pip` and `git`.
 
-Next, get the project. Install `pipenv` (`--user` option recommended, [see this article](https://stackoverflow.com/questions/42988977/what-is-the-purpose-pip-install-user)) and use this to install the project dependencies.
+Next, get the project. Install `pipenv` (`--user` option recommended, [see this article](https://stackoverflow.com/questions/42988977/what-is-the-purpose-pip-install-user)) and [this article for MacOS](https://stackoverflow.com/questions/60004431/pip-error-when-trying-to-run-pip-command-from-virtualenv-on-macos).
+
+Once you have `pipenv`, you can use it to install the project dependencies.
 ```
 git clone https://github.com/tuck1s/sparkyEvents.git
 cd sparkyEvents
-pip install --user pipenv
+python3 -m pip install pipenv
 pipenv install
 pipenv shell
 ```
