@@ -31,4 +31,5 @@ jobs:
     - name: Basic smoke test
       run: |
         mv sparkpost.ini.example sparkpost.ini
-        pipenv run ./sparkyEvents.py
+        # basic tests - command line tool installed and gives help/usage
+        pipenv run ./sparkyEvents.py -h
