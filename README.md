@@ -3,7 +3,8 @@
 [Sign up](https://app.sparkpost.com/join?plan=free-0817?src=Social%20Media&sfdcid=70160000000pqBb&pc=GitHubSignUp&utm_source=github&utm_medium=social-media&utm_campaign=github&utm_content=sign-up) for a SparkPost account and visit our [Developer Hub](https://developers.sparkpost.com) for even more content.
 
 # sparkyEvents (new)
-[![Build Status](https://travis-ci.com/tuck1s/sparkyEvents.svg?branch=master)](https://travis-ci.com/tuck1s/sparkyEvents)
+[![Python application](https://github.com/tuck1s/sparkyEvents/actions/workflows/python-app.yml/badge.svg)](https://github.com/tuck1s/sparkyEvents/actions/workflows/python-app.yml)
+
 
 Command-line tool to retrieve SparkPost message events in `.CSV` format.
 
@@ -26,7 +27,7 @@ Once you have `pipenv`, you can use it to install the project dependencies.
 ```
 git clone https://github.com/tuck1s/sparkyEvents.git
 cd sparkyEvents
-python3 -m pip install pipenv
+pip install --user pipenv
 pipenv install
 pipenv shell
 ```
